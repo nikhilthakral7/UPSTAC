@@ -8,10 +8,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.upgrad.upstac.config.security.UserLoggedInService;
 import org.upgrad.upstac.exception.AppException;
+import org.upgrad.upstac.testrequests.RequestStatus;
 import org.upgrad.upstac.testrequests.TestRequest;
 import org.upgrad.upstac.testrequests.TestRequestQueryService;
 import org.upgrad.upstac.testrequests.TestRequestUpdateService;
 import org.upgrad.upstac.testrequests.flow.TestRequestFlowService;
+import org.upgrad.upstac.users.User;
 
 import javax.validation.ConstraintViolationException;
 import java.util.List;
@@ -51,8 +53,12 @@ public class ConsultationController {
         // make use of the findBy() method from testRequestQueryService class
         //return the result
         // For reference check the method requestHistory() method from TestRequestController class
-        return null; // replace this line with your code
-
+        try{
+            return testRequestQueryService.findBy(RequestStatus.LAB_TEST_COMPLETED);
+        }
+        catch (AppException ex){
+            throw asBadRequest(ex.getMessage());
+        }
     }
 
     @GetMapping
@@ -64,10 +70,13 @@ public class ConsultationController {
         //Make use of the findByDoctor() method from testRequestQueryService class to get the list
         // For reference check the method getPendingTests() method from TestRequestController class
 
-        return null; // replace this line with your code
-
-
-
+        try{
+            User user = userLoggedInService.getLoggedInUser();
+            return testRequestQueryService.findByDoctor(user);
+        }
+        catch (AppException ex){
+            throw asBadRequest(ex.getMessage());
+        }
     }
 
 
@@ -81,7 +90,9 @@ public class ConsultationController {
         // return the above created object
         // Refer to the method createRequest() from the TestRequestController class
         try {
-            return null; // replace this line of code with your implementation
+            User user = userLoggedInService.getLoggedInUser();
+            TestRequest testRequest = testRequestUpdateService.assignForConsultation(id, user);
+            return testRequest;
         }catch (AppException e) {
             throw asBadRequest(e.getMessage());
         }
@@ -98,8 +109,9 @@ public class ConsultationController {
         //to update the current test request id with the testResult details by the current user(object created)
 
         try {
-            return null; // replace this line of code with your implementation
-
+            User user = userLoggedInService.getLoggedInUser();
+            TestRequest testRequest = testRequestUpdateService.updateConsultation(id, testResult, user);
+            return testRequest;
         } catch (ConstraintViolationException e) {
             throw asConstraintViolation(e);
         }catch (AppException e) {
