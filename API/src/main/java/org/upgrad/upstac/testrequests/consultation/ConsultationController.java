@@ -69,10 +69,9 @@ public class ConsultationController {
         //Implement this method to return the list of test requests assigned to current doctor(make use of the above created User object)
         //Make use of the findByDoctor() method from testRequestQueryService class to get the list
         // For reference check the method getPendingTests() method from TestRequestController class
-
         try{
-            User user = userLoggedInService.getLoggedInUser();
-            return testRequestQueryService.findByDoctor(user);
+            User doctor = userLoggedInService.getLoggedInUser();
+            return testRequestQueryService.findByDoctor(doctor);
         }
         catch (AppException ex){
             throw asBadRequest(ex.getMessage());
@@ -90,8 +89,8 @@ public class ConsultationController {
         // return the above created object
         // Refer to the method createRequest() from the TestRequestController class
         try {
-            User user = userLoggedInService.getLoggedInUser();
-            TestRequest testRequest = testRequestUpdateService.assignForConsultation(id, user);
+            User doctor = userLoggedInService.getLoggedInUser();
+            TestRequest testRequest = testRequestUpdateService.assignForConsultation(id, doctor);
             return testRequest;
         }catch (AppException e) {
             throw asBadRequest(e.getMessage());
@@ -107,10 +106,9 @@ public class ConsultationController {
         // Create an object of the User class to get the logged in user
         // Create an object of TestResult class and make use of updateConsultation() method from testRequestUpdateService class
         //to update the current test request id with the testResult details by the current user(object created)
-
         try {
-            User user = userLoggedInService.getLoggedInUser();
-            TestRequest testRequest = testRequestUpdateService.updateConsultation(id, testResult, user);
+            User doctor = userLoggedInService.getLoggedInUser();
+            TestRequest testRequest = testRequestUpdateService.updateConsultation(id, testResult, doctor);
             return testRequest;
         } catch (ConstraintViolationException e) {
             throw asConstraintViolation(e);

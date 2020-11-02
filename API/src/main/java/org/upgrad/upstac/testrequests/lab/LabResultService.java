@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import org.upgrad.upstac.exception.AppException;
 import org.upgrad.upstac.testrequests.TestRequest;
 import org.upgrad.upstac.users.User;
 
@@ -28,9 +29,15 @@ public class LabResultService {
         //Implement this method to create the lab result module service
         // create object of LabResult class and use the setter methods to set tester and testRequest details
         // make use of saveLabResult() method to return the LabResult object
+
+        //creating a new lab result object
         LabResult labResult = new LabResult();
+
+        //assigning tester and test request to this object
         labResult.setTester(tester);
         labResult.setRequest(testRequest);
+
+        //saving the object in database
         return saveLabResult(labResult);
     }
 
@@ -56,7 +63,10 @@ public class LabResultService {
         // HeartBeat, OxygenLevel, Temperature, Result and UpdatedOn values
         // make use of the saveLabResult() method to return the object of LabResult
 
-        LabResult labResult = labResultRepository.findByRequest(testRequest).get();
+        //find lab result from database
+        LabResult labResult = labResultRepository.findByRequest(testRequest).orElseThrow(() -> new AppException("Unable to find lab result for this test request"));
+
+        //set lab result values from user input (tester)
         labResult.setBloodPressure(createLabResult.getBloodPressure());
         labResult.setComments(createLabResult.getComments());
         labResult.setHeartBeat(createLabResult.getHeartBeat());
@@ -64,6 +74,8 @@ public class LabResultService {
         labResult.setTemperature(createLabResult.getTemperature());
         labResult.setResult(createLabResult.getResult());
         labResult.setUpdatedOn(LocalDate.now());
+
+        //save lab result to database
         return saveLabResult(labResult);
 
     }
